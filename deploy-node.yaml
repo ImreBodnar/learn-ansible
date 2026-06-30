@@ -2,7 +2,6 @@
 - name: Install Node & NPM
   hosts: ec2
   become: true
-
   tasks:
     - name: Update apt repo & cache
       apt: update_cache=yes force_apt_get=yes cache_valid_time=3600
@@ -15,28 +14,34 @@
 - name: Create new Linux user for the app
   hosts: ec2
   become: true
+  vars_files:
+    project-vars.yaml
   tasks:
     - name: Create Linux user
       user:
-        name: imi
-        comment: Imi admin
+        name: "{{linux_user_name}}"
+        comment: NodeJS app user
         group: admin
+      register: user_creation_result
+    - debug: msg={{user_creation_result}}
 
 - name: Deploy NodeJs app
   hosts: ec2
   become: true
-  become_user: imi
+  vars_files:
+    project-vars.yaml
+  become_user: "{{linux_user_name}}"
   tasks:
     - name: Unpack the NodeJS file
       unarchive:
-        src: /home/imre-bodnar/nodejs-app/nodejs-app-1.0.0.tgz
-        dest: /home/imi
+        src: /home/imre-bodnar/nodejs-app/nodejs-app-{{app_version}}.tgz
+        dest: "{{base_folder}}"
     - name: Install dependencies
       npm:
-        path: /home/imi/package
+        path: "{{base_folder}}/package"
     - name: Start the app
       command:
-        chdir: /home/imi/package/app
+        chdir: "{{base_folder}}/package/app"
         cmd: node server
       async: 1000
       poll: 0
