@@ -12,19 +12,31 @@
           - nodejs
           - npm
 
+- name: Create new Linux user for the app
+  hosts: ec2
+  become: true
+  tasks:
+    - name: Create Linux user
+      user:
+        name: imi
+        comment: Imi admin
+        group: admin
+
 - name: Deploy NodeJs app
   hosts: ec2
+  become: true
+  become_user: imi
   tasks:
     - name: Unpack the NodeJS file
       unarchive:
         src: /home/imre-bodnar/nodejs-app/nodejs-app-1.0.0.tgz
-        dest: /home/ubuntu/
+        dest: /home/imi
     - name: Install dependencies
       npm:
-        path: /home/ubuntu/package
+        path: /home/imi/package
     - name: Start the app
       command:
-        chdir: /home/ubuntu/package/app
+        chdir: /home/imi/package/app
         cmd: node server
       async: 1000
       poll: 0
