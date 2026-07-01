@@ -1,6 +1,6 @@
 ---
 - name: Install Node & NPM
-  hosts: ec2
+  hosts: ec2_ubuntu
   become: true
   tasks:
     - name: Update apt repo & cache
@@ -12,7 +12,7 @@
           - npm
 
 - name: Create new Linux user for the app
-  hosts: ec2
+  hosts: ec2_ubuntu
   become: true
   vars_files:
     project-vars.yaml
@@ -26,7 +26,7 @@
     - debug: msg={{user_creation_result}}
 
 - name: Deploy NodeJs app
-  hosts: ec2
+  hosts: ec2_ubuntu
   become: true
   vars_files:
     project-vars.yaml

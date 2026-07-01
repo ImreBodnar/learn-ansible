@@ -1,7 +1,7 @@
-[ec2]
+[ec2_ubuntu]
 51.20.129.181
 
-[ec2:vars]
+[ec2_ubuntu:vars]
 ansible_ssh_private_key_file=~/.ssh/ansible.pem
 ansible_user=ubuntu
 ansible_python_interpreter=/usr/bin/python3.14
