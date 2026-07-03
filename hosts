@@ -1,5 +1,5 @@
 [ec2_ubuntu]
-51.20.129.181
+51.20.60.56
 
 [ec2_ubuntu:vars]
 ansible_ssh_private_key_file=~/.ssh/ansible.pem
