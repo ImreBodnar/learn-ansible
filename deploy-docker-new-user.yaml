@@ -1,0 +1,65 @@
+---
+- name: Install Docker
+  hosts: docker_server
+  bacome: true
+  tasks:
+    - name: Ensure Docker is installed
+      yum:
+        name: docker
+        update_cache: yes
+        state: present
+
+- name: Create new Linux user
+  hosts: docker_server
+  become: true
+  tasks:
+    - name: Create new Linux user
+      user:
+        name: imi
+        groups: adm,docker
+
+- name: Install Docker-Compose
+  hosts: docker_server
+  become: true
+  become_user: imi
+  tasks:
+    - name: Create docker-compose directory
+      file:
+        path: ~/.docker/cli-plugins
+        state: directory
+    - name: Get architecture of remote machine
+      shell: uname -m
+      register: remote_arch
+    - name: Install Docker-Compose plugins
+      get_url:
+        url: https://github.com/docker/compose/releases/latest/download/docker-compose-linux-{{remote_arch.stdout}}
+        dest: ~/.docker/cli-plugins/docker-compose
+        mode: +x
+
+- name: Start Docker
+  hosts: docker_server
+  become: true
+  tasks:
+    - name: Ensure Docker is running
+      systemd:
+        name: docker
+        state: started
+
+- name: Start Docker containers
+  hosts: docker_server
+  become: true
+  become_user: imi
+  vars_files:
+    - project-vars
+  tasks:
+    - name: Copy Docker-Compose
+      copy:
+        src: /home/imre-bodnar/docker-compose-full.yaml
+        dest: /home/imi/docker-compose.yaml
+    - name: Docker login
+      docker_login:
+        username: imrebodnar
+        password: "{{docker_password}}"
+    - name: Start containers from compose
+      community.docker.docker_compose_v2:
+        project_src: /home/imi
