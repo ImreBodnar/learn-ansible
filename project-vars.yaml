@@ -1,3 +1,5 @@
 app_version: 1.0.0
 base_folder: /home/imi
 linux_user_name: imi
+
+docker_password: q1w2e3r4
