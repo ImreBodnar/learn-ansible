@@ -1,27 +1,36 @@
 ---
-- name: Install Docker
+- name: Install Docker and ACL
   hosts: docker_server
-  bacome: true
+  become: true
   tasks:
     - name: Ensure Docker is installed
       yum:
         name: docker
         update_cache: yes
         state: present
+    - name: Install ACL
+      yum:
+        name: acl
+        update_cache: yes
+        state: present
 
 - name: Create new Linux user
   hosts: docker_server
   become: true
+  vars_files:
+    - project-vars.yaml
   tasks:
     - name: Create new Linux user
       user:
-        name: imi
+        name: "{{new_user_name}}"
         groups: adm,docker
 
 - name: Install Docker-Compose
   hosts: docker_server
+  vars_files:
+    - project-vars.yaml
   become: true
-  become_user: imi
+  become_user: "{{new_user_name}}"
   tasks:
     - name: Create docker-compose directory
       file:
@@ -48,18 +57,20 @@
 - name: Start Docker containers
   hosts: docker_server
   become: true
-  become_user: imi
+  become_user: "{{new_user_name}}"
   vars_files:
-    - project-vars
+    - project-vars.yaml
   tasks:
     - name: Copy Docker-Compose
       copy:
-        src: /home/imre-bodnar/docker-compose-full.yaml
-        dest: /home/imi/docker-compose.yaml
+        src: docker-compose-full.yaml
+        dest: /home/{{new_user_name}}/docker-compose.yaml
     - name: Docker login
       docker_login:
-        username: imrebodnar
+        username: "{{docker_username}}"
         password: "{{docker_password}}"
     - name: Start containers from compose
       community.docker.docker_compose_v2:
-        project_src: /home/imi
+        project_src: /home/{{new_user_name}}
+      register: run_compose_result
+    - debug: msg="{{run_compose_result.stderr_lines}}"

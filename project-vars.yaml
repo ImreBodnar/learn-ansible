@@ -1,5 +1,7 @@
 app_version: 1.0.0
 base_folder: /home/imi
 linux_user_name: imi
+new_user_name: anubis
 
-docker_password: q1w2e3r4
+docker_username : ???
+docker_password: ???

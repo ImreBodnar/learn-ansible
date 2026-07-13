@@ -1,0 +1,26 @@
+networks:
+  raid_network:
+    name: raid-network
+    driver: bridge
+
+services:
+  raid.cache:
+    image: redis:8.2.0
+    container_name: Raid.Cache
+    restart: always
+    networks:
+      - raid_network
+
+  raid.webapi:
+    image: bodnarimredocker/raid-webapi
+    container_name: Raid.WebApi
+    networks:
+      - raid_network
+
+  raid.webui:
+    image: bodnarimredocker/raid-webui
+    container_name: Raid.WebUi
+    depends_on:
+      - raid.webapi
+    networks:
+      - raid_network
