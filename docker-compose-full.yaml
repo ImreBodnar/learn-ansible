@@ -4,13 +4,6 @@ networks:
     driver: bridge
 
 services:
-  raid.cache:
-    image: redis:8.2.0
-    container_name: Raid.Cache
-    restart: always
-    networks:
-      - raid_network
-
   raid.webapi:
     image: bodnarimredocker/raid-webapi
     container_name: Raid.WebApi
