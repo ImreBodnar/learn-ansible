@@ -1,6 +1,7 @@
 ---
 - name: Wait for SSH connection
-  hosts: all
+  # hosts: all
+  hosts: aws_ec2
   gather_facts: False
   tasks:
     - name: Ensure SSH port open
@@ -15,7 +16,8 @@
     ansible_python_interpreter: /usr/bin/python3
 
 - name: Install Docker and ACL
-  hosts: all
+  # hosts: all
+  hosts: aws_ec2
   become: true
   tasks:
     - name: Ensure Docker is installed
@@ -30,7 +32,8 @@
         state: present
 
 - name: Create new Linux user
-  hosts: all
+  # hosts: all
+  hosts: aws_ec2
   become: true
   vars_files:
     - project-vars.yaml
@@ -41,7 +44,8 @@
         groups: adm,docker
 
 - name: Install Docker-Compose
-  hosts: all
+  # hosts: all
+  hosts: aws_ec2
   vars_files:
     - project-vars.yaml
   become: true
@@ -61,7 +65,8 @@
         mode: +x
 
 - name: Start Docker
-  hosts: all
+  # hosts: all
+  hosts: aws_ec2
   become: true
   tasks:
     - name: Ensure Docker is running
@@ -70,7 +75,8 @@
         state: started
 
 - name: Start Docker containers
-  hosts: all
+  # hosts: all
+  hosts: aws_ec2
   become: true
   become_user: "{{new_user_name}}"
   vars_files:
